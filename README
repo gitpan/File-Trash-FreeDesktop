@@ -1,0 +1,122 @@
+NAME
+    File::Trash::FreeDesktop - Trash files
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+     use File::Trash::FreeDesktop;
+
+     my $trash = File::Trash::FreeDesktop->new;
+
+DESCRIPTION
+    This module lets you trash/erase/restore files, also list the contents
+    of trash directories. This module follows the freedesktop.org trash
+    specification [1], with some notes/caveats:
+
+    *   For home trash, $HOME/.local/share/Trash is used instead of
+        $HOME/.Trash
+
+        This is what KDE and GNOME use these days.
+
+    *   Symlinks are currently not checked
+
+        The spec requires implementation to check whether trash directory is
+        a symlink, and refuse to use it in that case. This module currently
+        does not do said checking.
+
+    *   Currently cross-device copying is not implemented/done
+
+    *   Currently meant to be used by normal users, not administrators
+
+        This means, among others, this module only creates
+        "$topdir/.Trash-$uid" instead of "$topdir/.Trash". And there are
+        less paranoid checks being done.
+
+METHODS
+  $trash = File::Trash::FreeDesktop->new(%opts)
+    Constructor.
+
+    Currently there are no known options.
+
+  $trash->list_trashes() => LIST
+    List user's existing trash directories on the system.
+
+    Return a list of trash directories. Sample output:
+
+     ("/home/steven/.local/share/Trash",
+      "/tmp/.Trash-1000")
+
+  $trash->list_contents([$trash_dir]) => LIST
+    List contents of trash director(y|ies).
+
+    If $trash_dir is not specified, list contents from all existing trash
+    directories. Die if $trash_dir does not exist or inaccessible or
+    corrupt. Return a list of records like the sample below:
+
+     ({entry=>"file1", path=>"/home/steven/file1", deletion_date=>1342061508},
+      {entry=>"file1.2", path=>"/home/steven/sub/file1", deletion_date=>1342061580},
+      {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510})
+
+  $trash->trash($file)
+    Trash a file (move it into trash dir).
+
+    Will attempt to create "$home/.local/share/Trash" (or
+    "$topdir/.Trash-$uid" if file does not reside in the same
+    filesystem/device as user's home). Will die if attempt fails.
+
+    Will also die if moving file to trash (currently using rename()) fails.
+
+  $trash->recover($file[, $trash_dir])
+    Recover a file from trash.
+
+    Unless $trash_dir is specified, will search in all existing user's trash
+    dirs. Will die on errors (e.g. file is not found in trash).
+
+  $trash->erase($file[, $trash_dir]) => LIST
+    Erase (unlink()) a file in trash.
+
+    Unless $trash_dir is specified, will empty all existing user's trash
+    dirs. Will ignore if file does not exist in trash. Will die on errors.
+
+    Return list of files erased.
+
+  $trash->empty([$trash_dir]) => LIST
+    Empty trash.
+
+    Unless $trash_dir is specified, will empty all existing user's trash
+    dirs. Will die on errors.
+
+    Return list of files erased.
+
+SEE ALSO
+    [1] http://freedesktop.org/wiki/Specifications/trash-spec
+
+    Related modules on CPAN:
+
+    *   Trash::Park
+
+        Different trash structure (a single CSV file per trash to hold a
+        list of deleted files, files stored using original path structure,
+        e.g. "home/dir/file"). Does not create per-filesystem trash.
+
+    *   File::Trash
+
+        Different trash structure (does not keep info file, files stored
+        using original path structure, e.g. "home/dir/file"). Does not
+        create per-filesystem trash.
+
+    *   File::Remove
+
+        File::Remove includes the trash() function which supports Win32, but
+        no undeletion function is provided at the time of this writing.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
