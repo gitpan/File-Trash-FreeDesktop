@@ -6,7 +6,7 @@ use warnings;
 
 use Fcntl;
 
-our $VERSION = '0.02'; # VERSION
+our $VERSION = '0.03'; # VERSION
 
 sub new {
     require Cwd;
@@ -147,6 +147,11 @@ sub list_contents {
         }
     }
 
+    @res = sort {
+        $a->{deletion_date} <=> $b->{deletion_date} ||
+        $a->{entry} cmp $b->{entry}
+    } @res;
+
     @res;
 }
 
@@ -251,7 +256,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-version 0.02
+version 0.03
 
 =head1 SYNOPSIS
 
