@@ -2,7 +2,7 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    version 0.01
+    version 0.02
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -54,11 +54,14 @@ METHODS
     directories. Die if $trash_dir does not exist or inaccessible or
     corrupt. Return a list of records like the sample below:
 
-     ({entry=>"file1", path=>"/home/steven/file1", deletion_date=>1342061508},
-      {entry=>"file1.2", path=>"/home/steven/sub/file1", deletion_date=>1342061580},
-      {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510})
+     ({entry=>"file1", path=>"/home/steven/file1", deletion_date=>1342061508,
+       trash_dir=>"/home/steven/.local/share/Trash"},
+      {entry=>"file1.2", path=>"/home/steven/sub/file1", deletion_date=>1342061580,
+       trash_dir=>"/home/steven/.local/share/Trash"},
+      {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
+       trash_dir=>"/tmp/.Trash-1000"})
 
-  $trash->trash($file)
+  $trash->trash($file) => STR
     Trash a file (move it into trash dir).
 
     Will attempt to create "$home/.local/share/Trash" (or
@@ -66,6 +69,9 @@ METHODS
     filesystem/device as user's home). Will die if attempt fails.
 
     Will also die if moving file to trash (currently using rename()) fails.
+
+    Upon success, will return the location of the file in the trash dir
+    (e.g. "/tmp/.Trash-1000/files/foo").
 
   $trash->recover($file[, $trash_dir])
     Recover a file from trash.

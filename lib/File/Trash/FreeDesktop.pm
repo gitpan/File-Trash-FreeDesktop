@@ -6,7 +6,7 @@ use warnings;
 
 use Fcntl;
 
-our $VERSION = '0.01'; # VERSION
+our $VERSION = '0.02'; # VERSION
 
 sub new {
     require Cwd;
@@ -163,14 +163,16 @@ sub trash {
     my $name;
     my $fh;
     my $i = 1; my $limit = 1000;
+    my $tinfo;
     while (1) {
         $name = $name0 . ($i > 1 ? ".$i" : "");
-        last if sysopen($fh, "$trash_dir/info/$name.trashinfo",
-                        O_WRONLY | O_EXCL | O_CREAT);
+        $tinfo = "$trash_dir/info/$name.trashinfo";
+        last if sysopen($fh, $tinfo, O_WRONLY | O_EXCL | O_CREAT);
         die "Can't create trash info file $name.trashinfo in $trash_dir: $!"
             if $i >= $limit;
         $i++;
     }
+    my $tfile = "$trash_dir/files/$name";
 
     my @t = localtime();
     my $ts = sprintf("%04d%02d%02dT%02d:%02d:%02d",
@@ -178,10 +180,12 @@ sub trash {
     syswrite($fh, "[Trash Info]\nPath=$file0\nDeletionDate=$ts\n");
     close $fh or die "Can't write trash info for $name in $trash_dir: $!";
 
-    unless (rename($afile, "$trash_dir/files/$name")) {
+    unless (rename($afile, $tfile)) {
         unlink "$trash_dir/info/$name.trashinfo";
-        die "Can't rename $afile to $trash_dir/files/$name: $!";
+        die "Can't rename $afile to $tfile: $!";
     }
+
+    $tfile;
 }
 
 sub recover {
@@ -247,7 +251,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-version 0.01
+version 0.02
 
 =head1 SYNOPSIS
 
@@ -307,11 +311,14 @@ If $trash_dir is not specified, list contents from all existing trash
 directories. Die if $trash_dir does not exist or inaccessible or corrupt. Return
 a list of records like the sample below:
 
- ({entry=>"file1", path=>"/home/steven/file1", deletion_date=>1342061508},
-  {entry=>"file1.2", path=>"/home/steven/sub/file1", deletion_date=>1342061580},
-  {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510})
+ ({entry=>"file1", path=>"/home/steven/file1", deletion_date=>1342061508,
+   trash_dir=>"/home/steven/.local/share/Trash"},
+  {entry=>"file1.2", path=>"/home/steven/sub/file1", deletion_date=>1342061580,
+   trash_dir=>"/home/steven/.local/share/Trash"},
+  {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
+   trash_dir=>"/tmp/.Trash-1000"})
 
-=head2 $trash->trash($file)
+=head2 $trash->trash($file) => STR
 
 Trash a file (move it into trash dir).
 
@@ -320,6 +327,9 @@ file does not reside in the same filesystem/device as user's home). Will die if
 attempt fails.
 
 Will also die if moving file to trash (currently using rename()) fails.
+
+Upon success, will return the location of the file in the trash dir (e.g.
+C</tmp/.Trash-1000/files/foo>).
 
 =head2 $trash->recover($file[, $trash_dir])
 

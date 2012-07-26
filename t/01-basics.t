@@ -28,7 +28,9 @@ my $ht = $trash->_home_trash;
 diag "home trash is $ht";
 
 subtest "trash" => sub {
-    $trash->trash("f1");
+    my $tfile = $trash->trash("f1");
+    is($tfile, "$dir/.local/share/Trash/files/f1",
+       "return value of trash()");
     ok((!(-e "f1")), "f1 removed");
     ok((-f ".local/share/Trash/info/f1.trashinfo"), "f1.trashinfo created");
     ok((-f ".local/share/Trash/files/f1"), "files/f1 created");
@@ -52,7 +54,7 @@ subtest "erase" => sub {
 };
 
 subtest "empty" => sub {
-    $trash->trash("sub");
+    $trash->trash("sub"); # also test removing directories
     $trash->empty($ht);
     ok(!(-e "sub"), "sub removed");
 };
@@ -61,7 +63,7 @@ subtest "empty" => sub {
 # TODO test: list_trashes
 # TODO test: list_contents for all trashes
 # TODO test: empty for all trashes
-# TODO test: # TODO test: test errors ...
+# TODO test: test errors ...
 #   - die on {trash,recover,erase} nonexisting file
 #   - die on recover to existing file
 #   - die on fail to create $topdir/.Trash-$uid
