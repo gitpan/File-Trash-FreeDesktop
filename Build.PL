@@ -21,7 +21,7 @@ my %module_build_args = (
     "Steven Haryanto <stevenharyanto\@gmail.com>"
   ],
   "dist_name" => "File-Trash-FreeDesktop",
-  "dist_version" => "0.03",
+  "dist_version" => "0.04",
   "license" => "perl",
   "module_name" => "File::Trash::FreeDesktop",
   "recommends" => {},
@@ -30,6 +30,7 @@ my %module_build_args = (
     "File::HomeDir::FreeDesktop" => 0,
     "File::Remove" => 0,
     "List::MoreUtils" => 0,
+    "SHARYANTO::File::Util" => 0,
     "Sys::Filesystem" => 0,
     "Sys::Filesystem::MountPoint" => 0,
     "perl" => "5.010000"

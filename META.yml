@@ -21,10 +21,11 @@ requires:
   File::HomeDir::FreeDesktop: 0
   File::Remove: 0
   List::MoreUtils: 0
+  SHARYANTO::File::Util: 0
   Sys::Filesystem: 0
   Sys::Filesystem::MountPoint: 0
   perl: 5.010000
 resources:
   homepage: http://metacpan.org/dist/File-Trash-FreeDesktop
   repository: http://github.com/sharyanto/perl-File-Trash-FreeDesktop
-version: 0.03
+version: 0.04

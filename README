@@ -2,7 +2,7 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    version 0.03
+    version 0.04
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -61,7 +61,7 @@ METHODS
       {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
        trash_dir=>"/tmp/.Trash-1000"})
 
-  $trash->trash($file) => STR
+  $trash->trash([\%opts, ]$file) => STR
     Trash a file (move it into trash dir).
 
     Will attempt to create "$home/.local/share/Trash" (or
@@ -73,11 +73,28 @@ METHODS
     Upon success, will return the location of the file in the trash dir
     (e.g. "/tmp/.Trash-1000/files/foo").
 
-  $trash->recover($file[, $trash_dir])
+    If first argument is a hashref, it will be accepted as options. Known
+    options:
+
+    *   on_not_found => STR (default 'die')
+
+        Specify what to do when the file to be deleted is not found. The
+        default is 'die', but can also be set to 'ignore' and return
+        immediately.
+
+  $trash->recover([\%opts, ]$file[, $trash_dir])
     Recover a file from trash.
 
     Unless $trash_dir is specified, will search in all existing user's trash
-    dirs. Will die on errors (e.g. file is not found in trash).
+    dirs. Will die on errors.
+
+    If first argument is a hashref, it will be accepted as options. Known
+    options:
+
+    *   on_not_found => STR (default 'die')
+
+        Specify what to do when file is not found in the trash. The default
+        is 'die', but can also be set to 'ignore' and return immediately.
 
   $trash->erase($file[, $trash_dir]) => LIST
     Erase (unlink()) a file in trash.
