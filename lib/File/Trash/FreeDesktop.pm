@@ -7,7 +7,7 @@ use warnings;
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists);
 
-our $VERSION = '0.04'; # VERSION
+our $VERSION = '0.05'; # VERSION
 
 sub new {
     require Cwd;
@@ -220,10 +220,17 @@ sub recover {
     } else {
         $opts = {};
     }
-    $opts->{on_not_found} //= 'die';
+    $opts->{on_not_found}     //= 'die';
+    $opts->{on_target_exists} //= 'die';
     my ($file, $trash_dir0) = @_;
 
-    die "Restore target already exists: $file" if file_exists($file);
+    if (file_exists($file)) {
+        if ($opts->{on_target_exists} eq 'ignore') {
+            return 0;
+        } else {
+            die "Restore target already exists: $file";
+        }
+    }
 
     my @res = $self->list_contents($trash_dir0, {search_path=>$file});
     unless (@res) {
@@ -289,7 +296,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-version 0.04
+version 0.05
 
 =head1 SYNOPSIS
 
@@ -395,6 +402,11 @@ If first argument is a hashref, it will be accepted as options. Known options:
 
 Specify what to do when file is not found in the trash. The default is 'die',
 but can also be set to 'ignore' and return immediately.
+
+=item * on_target_exists => STR (default 'die')
+
+Specify what to do when restore target already exists. The default is 'die', but
+can also be set to 'ignore' and return immediately.
 
 =back
 

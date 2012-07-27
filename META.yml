@@ -28,4 +28,4 @@ requires:
 resources:
   homepage: http://metacpan.org/dist/File-Trash-FreeDesktop
   repository: http://github.com/sharyanto/perl-File-Trash-FreeDesktop
-version: 0.04
+version: 0.05

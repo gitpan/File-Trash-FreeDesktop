@@ -2,7 +2,7 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    version 0.04
+    version 0.05
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -94,6 +94,11 @@ METHODS
     *   on_not_found => STR (default 'die')
 
         Specify what to do when file is not found in the trash. The default
+        is 'die', but can also be set to 'ignore' and return immediately.
+
+    *   on_target_exists => STR (default 'die')
+
+        Specify what to do when restore target already exists. The default
         is 'die', but can also be set to 'ignore' and return immediately.
 
   $trash->erase($file[, $trash_dir]) => LIST
