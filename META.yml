@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build: 0.3601
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,7 @@ requires:
   File::HomeDir::FreeDesktop: 0
   File::Remove: 0
   List::MoreUtils: 0
+  Log::Any: 0
   SHARYANTO::File::Util: 0
   Sys::Filesystem: 0
   Sys::Filesystem::MountPoint: 0
@@ -28,4 +29,4 @@ requires:
 resources:
   homepage: http://metacpan.org/dist/File-Trash-FreeDesktop
   repository: http://github.com/sharyanto/perl-File-Trash-FreeDesktop
-version: 0.05
+version: 0.06

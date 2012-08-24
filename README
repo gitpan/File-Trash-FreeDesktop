@@ -2,7 +2,7 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    version 0.05
+    version 0.06
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -100,6 +100,17 @@ METHODS
 
         Specify what to do when restore target already exists. The default
         is 'die', but can also be set to 'ignore' and return immediately.
+
+    *   mtime => INT
+
+        Only recover file if file's mtime is the one specified. This can be
+        useful to make sure that the file we recover is really the one that
+        we trashed earlier, especially if we trash several files with the
+        same path.
+
+        (Ideally, instead of mtime we should use some unique ID that we
+        write in the .trashinfo file, but I fear that an extra parameter in
+        .trashinfo file might confuse other implementations.)
 
   $trash->erase($file[, $trash_dir]) => LIST
     Erase (unlink()) a file in trash.
