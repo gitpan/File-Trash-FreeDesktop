@@ -21,7 +21,7 @@ my %module_build_args = (
     "Steven Haryanto <stevenharyanto\@gmail.com>"
   ],
   "dist_name" => "File-Trash-FreeDesktop",
-  "dist_version" => "0.07",
+  "dist_version" => "0.08",
   "license" => "perl",
   "module_name" => "File::Trash::FreeDesktop",
   "recommends" => {},

@@ -4,7 +4,7 @@
       "Steven Haryanto <stevenharyanto@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921",
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
    "license" : [
       "perl_5"
    ],
@@ -26,21 +26,21 @@
       },
       "runtime" : {
          "requires" : {
-            "File::HomeDir::FreeDesktop" : "0",
-            "File::Remove" : "0",
-            "List::MoreUtils" : "0",
-            "Log::Any" : "0",
+            "File::HomeDir::FreeDesktop" : 0,
+            "File::Remove" : 0,
+            "List::MoreUtils" : 0,
+            "Log::Any" : 0,
             "SHARYANTO::File::Util" : "0.26",
-            "Sys::Filesystem" : "0",
-            "Sys::Filesystem::MountPoint" : "0",
+            "Sys::Filesystem" : 0,
+            "Sys::Filesystem::MountPoint" : 0,
             "perl" : "5.010000"
          }
       },
       "test" : {
          "requires" : {
-            "File::Slurp" : "0",
-            "File::chdir" : "0",
-            "Test::Exception" : "0",
+            "File::Slurp" : 0,
+            "File::chdir" : 0,
+            "Test::Exception" : 0,
             "Test::More" : "0.96"
          }
       }
@@ -52,6 +52,6 @@
          "url" : "http://github.com/sharyanto/perl-File-Trash-FreeDesktop"
       }
    },
-   "version" : "0.07"
+   "version" : "0.08"
 }
 

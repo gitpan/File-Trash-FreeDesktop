@@ -2,7 +2,7 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    version 0.07
+    version 0.08
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -82,6 +82,16 @@ METHODS
         default is 'die', but can also be set to 'ignore' and return
         immediately.
 
+    *   suffix => STR
+
+        Pick a suffix. Normally, file will be stored in "files/ORIGNAME"
+        inside trash directory, or, if that file already exists, in
+        "files/ORIGNAME.1", "files/ORIGNAME.2", and so on. This setting
+        overrides this behavior and picks "files/ORIGNAME.SUFFIX". Can be
+        used to identify and restore particular file later. However, will
+        die if file with that suffix already exists, so be sure to pick a
+        unique suffix.
+
   $trash->recover([\%opts, ]$file[, $trash_dir])
     Recover a file from trash.
 
@@ -111,6 +121,14 @@ METHODS
         (Ideally, instead of mtime we should use some unique ID that we
         write in the .trashinfo file, but I fear that an extra parameter in
         .trashinfo file might confuse other implementations.)
+
+        See also "suffix", which is the recommended way to identify and
+        recover particular file.
+
+    *   suffix => STR
+
+        Only recover file having the specified suffix, chosen previously
+        during trash().
 
   $trash->erase($file[, $trash_dir]) => LIST
     Erase (unlink()) a file in trash.
