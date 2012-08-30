@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists l_abs_path);
 
-our $VERSION = '0.08'; # VERSION
+our $VERSION = '0.09'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -28,6 +28,7 @@ sub new {
 
 sub _mk_trash {
     my ($self, $trash_dir) = @_;
+    $log->tracef("Creating trash directory %s ...", $trash_dir);
     for ("", "/files", "/info") {
         my $d = "$trash_dir$_";
         unless (-d $d) {
@@ -48,7 +49,12 @@ sub _select_trash {
     file_exists($file0) or die "File doesn't exist: $file0";
     my $afile = l_abs_path($file0);
 
-    my $mp = Sys::Filesystem::MountPoint::path_to_mount_point($afile);
+    # since path_to_mount_point resolves symlink (sigh), we need to remove the
+    # leaf. otherwise: /mnt/sym -> / will cause mount point to become / instead
+    # of /mnt
+    my $afile2 = $afile; $afile2 =~ s!/[^/]+\z!! if (-l $file0);
+    my $mp = Sys::Filesystem::MountPoint::path_to_mount_point($afile2);
+
     my @trash_dirs;
     my $home_trash = $self->_home_trash;
     if ($self->{_home_mp} eq $mp) {
@@ -57,9 +63,13 @@ sub _select_trash {
         my $mp = $mp eq "/" ? "" : $mp; # prevent double-slash //
         @trash_dirs = ("$mp/.Trash-$>", "$mp/.Trash/$>");
     }
+    #$log->tracef("mp=%s, afile=%s, trash_dirs = %s", $mp,$afile,\@trash_dirs);
 
     for (@trash_dirs) {
-        (-d $_) and return $_;
+        (-d $_) and do {
+            $log->tracef("Selected trash for %s = %s", $afile, $_);
+            return $_;
+        };
     }
 
     if ($create) {
@@ -69,6 +79,7 @@ sub _select_trash {
             $self->_mk_trash($trash_dirs[0]);
         }
     }
+    $log->tracef("Selected trash for %s = %s", $afile, $trash_dirs[0]);
     return $trash_dirs[0];
 }
 
@@ -315,13 +326,43 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SYNOPSIS
 
  use File::Trash::FreeDesktop;
 
  my $trash = File::Trash::FreeDesktop->new;
+
+ # list available (for the running user) trash directories
+ my @trashes = $trash->list_trashes;
+
+ # list the content of a trash directory
+ my @content = $trash->list_contents("/tmp/.Trash-1000");
+
+ # list the content of all available trash directories
+ my @content = $trash->list_contents;
+
+ # trash a file
+ $trash->trash("/foo/bar");
+
+ # specify some options when trashing
+ $trash->trash({on_not_found=>'ignore'}, "/foo/bar");
+
+ # recover a file from trash (untrash)
+ $trash->recover('/foo/bar');
+
+ # untrash a file from a specific trash directory
+ $trash->recover('/tmp/file', '/tmp/.Trash-1000');
+
+ # specify some options when untrashing
+ $trash->recover({on_not_found=>'ignore', on_target_exists=>'ignore'}, '/path');
+
+ # empty a trash directory
+ $trash->empty("$ENV{HOME}/.local/share/Trash");
+
+ # empty all available trashes
+ $trash->empty;
 
 =head1 DESCRIPTION
 
@@ -343,10 +384,15 @@ checking.
 
 =item * Currently cross-device copying is not implemented/done
 
-=item * Currently meant to be used by normal users, not administrators
+It should not matter though, because trash directories are per-filesystem.
 
-This means, among others, this module only creates C<$topdir/.Trash-$uid>
-instead of C<$topdir/.Trash>. And there are less paranoid checks being done.
+=back
+
+Some other notes:
+
+=over 4
+
+=item *
 
 =back
 
