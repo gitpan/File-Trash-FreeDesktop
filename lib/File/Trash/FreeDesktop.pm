@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists l_abs_path);
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -42,10 +42,21 @@ sub _home_trash {
     "$self->{_home}/.local/share/Trash";
 }
 
+sub _mk_home_trash {
+    my ($self) = @_;
+    for (".local", ".local/share") {
+        my $d = "$self->{_home}/$_";
+        unless (-d $d) {
+            mkdir $d or die "Can't mkdir $d: $!";
+        }
+    }
+    $self->_mk_trash("$self->{_home}/.local/share/Trash");
+}
+
 sub _select_trash {
     require Sys::Filesystem::MountPoint;
 
-    my ($self, $file0, $create) = @_;
+    my ($self, $file0) = @_;
     file_exists($file0) or die "File doesn't exist: $file0";
     my $afile = l_abs_path($file0);
 
@@ -65,33 +76,33 @@ sub _select_trash {
     }
     #$log->tracef("mp=%s, afile=%s, trash_dirs = %s", $mp,$afile,\@trash_dirs);
 
+    my ($sel, $create);
     for (@trash_dirs) {
-        (-d $_) and do {
-            $log->tracef("Selected trash for %s = %s", $afile, $_);
-            return $_;
-        };
+        my @st = stat;
+        if (-d _) {
+            $sel = $_;
+            # will we be able to write to this dir? (same owner or we are root).
+            # we "create" anyway to fix missing files/ or info/ subdir (happens
+            # from time to time for trash in /tmp).
+            $create = $st[4] == $> || !$>;
+            last;
+        }
     }
+    if (!$sel) {
+        $sel = $trash_dirs[0];
+        $create = 1;
+    }
+    $log->tracef("Selected trash for %s = %s", $afile, $sel);
 
     if ($create) {
-        if ($trash_dirs[0] eq $home_trash) {
+        if ($sel eq $home_trash) {
             $self->_mk_home_trash;
         } else {
-            $self->_mk_trash($trash_dirs[0]);
+            $self->_mk_trash($sel);
         }
     }
     $log->tracef("Selected trash for %s = %s", $afile, $trash_dirs[0]);
     return $trash_dirs[0];
-}
-
-sub _mk_home_trash {
-    my ($self) = @_;
-    for (".local", ".local/share") {
-        my $d = "$self->{_home}/$_";
-        unless (-d $d) {
-            mkdir $d or die "Can't mkdir $d: $!";
-        }
-    }
-    $self->_mk_trash("$self->{_home}/.local/share/Trash");
 }
 
 sub list_trashes {
@@ -144,6 +155,7 @@ sub list_contents {
   L1:
     for my $trash_dir (@trash_dirs) {
         next unless -d $trash_dir;
+        next unless -d "$trash_dir/info";
         opendir my($dh), "$trash_dir/info"
             or die "Can't read trash info dir: $!";
         for my $e (readdir $dh) {
@@ -200,7 +212,7 @@ sub trash {
         }
     }
     my $afile = l_abs_path($file0);
-    my $trash_dir = $self->_select_trash($afile, 1);
+    my $trash_dir = $self->_select_trash($afile);
 
     # try to create info/NAME first
     my $name0 = $afile; $name0 =~ s!.*/!!; $name0 = "WTF" unless length($name0);
@@ -326,7 +338,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 
