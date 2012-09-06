@@ -2,7 +2,7 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    version 0.10
+    version 0.11
 
 SYNOPSIS
      use File::Trash::FreeDesktop;

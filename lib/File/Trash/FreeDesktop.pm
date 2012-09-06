@@ -8,11 +8,10 @@ use Log::Any '$log';
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists l_abs_path);
 
-our $VERSION = '0.10'; # VERSION
+our $VERSION = '0.11'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
-    require Sys::Filesystem::MountPoint;
 
     my ($class, %opts) = @_;
 
@@ -20,8 +19,6 @@ sub new {
         or die "Can't get homedir, ".
             "probably not a freedesktop-compliant environment?";
     $opts{_home} = l_abs_path($home);
-    $opts{_home_mp} = Sys::Filesystem::MountPoint::path_to_mount_point(
-        $opts{_home});
 
     bless \%opts, $class;
 }
@@ -65,6 +62,9 @@ sub _select_trash {
     # of /mnt
     my $afile2 = $afile; $afile2 =~ s!/[^/]+\z!! if (-l $file0);
     my $mp = Sys::Filesystem::MountPoint::path_to_mount_point($afile2);
+
+    $self->{_home_mp} //= Sys::Filesystem::MountPoint::path_to_mount_point(
+        $self->{_home});
 
     my @trash_dirs;
     my $home_trash = $self->_home_trash;
@@ -338,7 +338,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-version 0.10
+version 0.11
 
 =head1 SYNOPSIS
 
