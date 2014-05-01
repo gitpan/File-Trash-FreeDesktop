@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists l_abs_path);
 
-our $VERSION = '0.12'; # VERSION
+our $VERSION = '0.13'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -61,7 +61,6 @@ sub _select_trash {
     # leaf. otherwise: /mnt/sym -> / will cause mount point to become / instead
     # of /mnt
     my $afile2 = $afile; $afile2 =~ s!/[^/]+\z!! if (-l $file0);
-    say "afile2=$afile2";
     my $file_mp = Sys::Filesystem::MountPoint::path_to_mount_point($afile2);
 
     $self->{_home_mp} //= Sys::Filesystem::MountPoint::path_to_mount_point(
@@ -332,7 +331,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.12 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-05-01.
+This document describes version 0.13 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-05-01.
 
 =head1 SYNOPSIS
 
