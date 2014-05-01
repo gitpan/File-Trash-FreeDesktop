@@ -1,6 +1,6 @@
 package File::Trash::FreeDesktop;
 
-use 5.010;
+use 5.010001;
 use strict;
 use warnings;
 use Log::Any '$log';
@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists l_abs_path);
 
-our $VERSION = '0.11'; # VERSION
+our $VERSION = '0.12'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -25,10 +25,10 @@ sub new {
 
 sub _mk_trash {
     my ($self, $trash_dir) = @_;
-    $log->tracef("Creating trash directory %s ...", $trash_dir);
     for ("", "/files", "/info") {
         my $d = "$trash_dir$_";
         unless (-d $d) {
+            $log->tracef("Creating directory %s ...", $d);
             mkdir $d, 0700 or die "Can't mkdir $d: $!";
         }
     }
@@ -61,48 +61,35 @@ sub _select_trash {
     # leaf. otherwise: /mnt/sym -> / will cause mount point to become / instead
     # of /mnt
     my $afile2 = $afile; $afile2 =~ s!/[^/]+\z!! if (-l $file0);
-    my $mp = Sys::Filesystem::MountPoint::path_to_mount_point($afile2);
+    say "afile2=$afile2";
+    my $file_mp = Sys::Filesystem::MountPoint::path_to_mount_point($afile2);
 
     $self->{_home_mp} //= Sys::Filesystem::MountPoint::path_to_mount_point(
         $self->{_home});
 
-    my @trash_dirs;
-    my $home_trash = $self->_home_trash;
-    if ($self->{_home_mp} eq $mp) {
-        @trash_dirs = ($self->_home_trash);
-    } else {
-        my $mp = $mp eq "/" ? "" : $mp; # prevent double-slash //
-        @trash_dirs = ("$mp/.Trash-$>", "$mp/.Trash/$>");
+    # try home trash
+    if ($self->{_home_mp} eq $file_mp) {
+        my $trash_dir = $self->_home_trash;
+        $log->tracef("Selected home trash for %s = %s", $afile, $trash_dir);
+        $self->_mk_home_trash;
+        return $trash_dir;
     }
-    #$log->tracef("mp=%s, afile=%s, trash_dirs = %s", $mp,$afile,\@trash_dirs);
 
-    my ($sel, $create);
-    for (@trash_dirs) {
-        my @st = stat;
-        if (-d _) {
-            $sel = $_;
-            # will we be able to write to this dir? (same owner or we are root).
-            # we "create" anyway to fix missing files/ or info/ subdir (happens
-            # from time to time for trash in /tmp).
-            $create = $st[4] == $> || !$>;
-            last;
+    # try file's mountpoint or mountpoint + "/tmp" (try "/tmp" first if /)
+    for my $dir ($file_mp eq '/' ?
+                     ("/tmp", "/") : ($file_mp, "$file_mp/tmp")) {
+        next unless -w $dir;
+        if ($dir ne $file_mp) {
+            my $mp = Sys::Filesystem::MountPoint::path_to_mount_point($dir);
+            next unless $mp eq $file_mp;
         }
+        my $trash_dir = ($dir eq "/" ? "" : $dir) . "/.Trash-$>";
+        $log->tracef("Selected trash for %s = %s", $afile, $trash_dir);
+        $self->_mk_trash($trash_dir);
+        return $trash_dir;
     }
-    if (!$sel) {
-        $sel = $trash_dirs[0];
-        $create = 1;
-    }
-    $log->tracef("Selected trash for %s = %s", $afile, $sel);
 
-    if ($create) {
-        if ($sel eq $home_trash) {
-            $self->_mk_home_trash;
-        } else {
-            $self->_mk_trash($sel);
-        }
-    }
-    $log->tracef("Selected trash for %s = %s", $afile, $trash_dirs[0]);
-    return $trash_dirs[0];
+    die "Can't find suitable trash dir";
 }
 
 sub list_trashes {
@@ -117,7 +104,12 @@ sub list_trashes {
     my @res = map { l_abs_path($_) }
         grep {-d} (
             $self->_home_trash,
-            (map { ("$_/.Trash-$>", "$_/.Trash/$>") } @mp)
+            (map { (
+                "$_/.Trash-$>",
+                "$_/tmp/.Trash-$>",
+                "$_/.Trash/$>",
+                "$_/tmp/.Trash/$>",
+                ) } @mp)
         );
 
     List::MoreUtils::uniq(@res);
@@ -154,10 +146,10 @@ sub list_contents {
     my @res;
   L1:
     for my $trash_dir (@trash_dirs) {
-        next unless -d $trash_dir;
-        next unless -d "$trash_dir/info";
+        #next unless -d $trash_dir;
+        #next unless -d "$trash_dir/info";
         opendir my($dh), "$trash_dir/info"
-            or die "Can't read trash info dir: $!";
+            or die "Can't read trash info dir $trash_dir/info: $!";
         for my $e (readdir $dh) {
             next unless $e =~ /\.trashinfo$/;
             local $/;
@@ -328,9 +320,11 @@ sub empty {
 1;
 # ABSTRACT: Trash files
 
-
 __END__
+
 =pod
+
+=encoding UTF-8
 
 =head1 NAME
 
@@ -338,7 +332,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-version 0.11
+This document describes version 0.12 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-05-01.
 
 =head1 SYNOPSIS
 
@@ -444,9 +438,10 @@ a list of records like the sample below:
 
 Trash a file (move it into trash dir).
 
-Will attempt to create C<$home/.local/share/Trash> (or C<$topdir/.Trash-$uid> if
-file does not reside in the same filesystem/device as user's home). Will die if
-attempt fails.
+Will try to find a trash dir that resides in the same filesystem/device as the
+file and is writable. C<$home/.local/share/Trash> is tried first, then
+C<$device_root/.Trash-$uid>, then C<$device_root/tmp/.Trash-$uid>. Will die if
+no suitable trash dir is found.
 
 Will also die if moving file to trash (currently using rename()) fails.
 
@@ -531,6 +526,11 @@ die on errors.
 
 Return list of files erased.
 
+=head1 NOTES
+
+Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How about
+/PATH/.Trash-UID/{files,info}.
+
 =head1 SEE ALSO
 
 [1] http://freedesktop.org/wiki/Specifications/trash-spec
@@ -557,16 +557,31 @@ undeletion function is provided at the time of this writing.
 
 =back
 
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/File-Trash-FreeDesktop>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-File-Trash-FreeDesktop>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDesktop>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
 =head1 AUTHOR
 
 Steven Haryanto <stevenharyanto@gmail.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by Steven Haryanto.
+This software is copyright (c) 2014 by Steven Haryanto.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

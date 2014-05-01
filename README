@@ -2,7 +2,8 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    version 0.11
+    This document describes version 0.12 of File::Trash::FreeDesktop (from
+    Perl distribution File-Trash-FreeDesktop), released on 2014-05-01.
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -95,9 +96,10 @@ METHODS
   $trash->trash([\%opts, ]$file) => STR
     Trash a file (move it into trash dir).
 
-    Will attempt to create "$home/.local/share/Trash" (or
-    "$topdir/.Trash-$uid" if file does not reside in the same
-    filesystem/device as user's home). Will die if attempt fails.
+    Will try to find a trash dir that resides in the same filesystem/device
+    as the file and is writable. "$home/.local/share/Trash" is tried first,
+    then "$device_root/.Trash-$uid", then "$device_root/tmp/.Trash-$uid".
+    Will die if no suitable trash dir is found.
 
     Will also die if moving file to trash (currently using rename()) fails.
 
@@ -177,6 +179,10 @@ METHODS
 
     Return list of files erased.
 
+NOTES
+    Weird scenario: /PATH/.Trash-UID is mounted on its own scenario? How
+    about /PATH/.Trash-UID/{files,info}.
+
 SEE ALSO
     [1] http://freedesktop.org/wiki/Specifications/trash-spec
 
@@ -199,11 +205,27 @@ SEE ALSO
         File::Remove includes the trash() function which supports Win32, but
         no undeletion function is provided at the time of this writing.
 
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/File-Trash-FreeDesktop>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-File-Trash-FreeDesktop>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=File-Trash-FreeDeskto
+    p>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
 AUTHOR
     Steven Haryanto <stevenharyanto@gmail.com>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2012 by Steven Haryanto.
+    This software is copyright (c) 2014 by Steven Haryanto.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.
