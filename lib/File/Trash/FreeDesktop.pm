@@ -8,7 +8,7 @@ use Log::Any '$log';
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists l_abs_path);
 
-our $VERSION = '0.13'; # VERSION
+our $VERSION = '0.14'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -331,7 +331,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.13 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-05-01.
+This document describes version 0.14 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-05-17.
 
 =head1 SYNOPSIS
 
