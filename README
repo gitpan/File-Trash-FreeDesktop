@@ -2,8 +2,8 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    This document describes version 0.14 of File::Trash::FreeDesktop (from
-    Perl distribution File-Trash-FreeDesktop), released on 2014-05-17.
+    This document describes version 0.15 of File::Trash::FreeDesktop (from
+    Perl distribution File-Trash-FreeDesktop), released on 2014-11-13.
 
 SYNOPSIS
      use File::Trash::FreeDesktop;
@@ -76,7 +76,7 @@ METHODS
 
     Return a list of trash directories. Sample output:
 
-     ("/home/steven/.local/share/Trash",
+     ("/home/mince/.local/share/Trash",
       "/tmp/.Trash-1000")
 
   $trash->list_contents([$trash_dir]) => LIST
@@ -86,10 +86,10 @@ METHODS
     directories. Die if $trash_dir does not exist or inaccessible or
     corrupt. Return a list of records like the sample below:
 
-     ({entry=>"file1", path=>"/home/steven/file1", deletion_date=>1342061508,
-       trash_dir=>"/home/steven/.local/share/Trash"},
-      {entry=>"file1.2", path=>"/home/steven/sub/file1", deletion_date=>1342061580,
-       trash_dir=>"/home/steven/.local/share/Trash"},
+     ({entry=>"file1", path=>"/home/mince/file1", deletion_date=>1342061508,
+       trash_dir=>"/home/mince/.local/share/Trash"},
+      {entry=>"file1.2", path=>"/home/mince/sub/file1", deletion_date=>1342061580,
+       trash_dir=>"/home/mince/.local/share/Trash"},
       {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
        trash_dir=>"/tmp/.Trash-1000"})
 
@@ -211,7 +211,7 @@ HOMEPAGE
 
 SOURCE
     Source repository is at
-    <https://github.com/sharyanto/perl-File-Trash-FreeDesktop>.
+    <https://github.com/perlancar/perl-File-Trash-FreeDesktop>.
 
 BUGS
     Please report any bugs or feature requests on the bugtracker website
@@ -222,10 +222,10 @@ BUGS
     to an existing test-file that illustrates the bug or desired feature.
 
 AUTHOR
-    Steven Haryanto <stevenharyanto@gmail.com>
+    perlancar <perlancar@cpan.org>
 
 COPYRIGHT AND LICENSE
-    This software is copyright (c) 2014 by Steven Haryanto.
+    This software is copyright (c) 2014 by perlancar@cpan.org.
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

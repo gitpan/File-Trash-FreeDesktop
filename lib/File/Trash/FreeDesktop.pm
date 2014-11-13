@@ -1,5 +1,8 @@
 package File::Trash::FreeDesktop;
 
+our $DATE = '2014-11-13'; # DATE
+our $VERSION = '0.15'; # VERSION
+
 use 5.010001;
 use strict;
 use warnings;
@@ -7,8 +10,6 @@ use Log::Any '$log';
 
 use Fcntl;
 use SHARYANTO::File::Util qw(file_exists l_abs_path);
-
-our $VERSION = '0.14'; # VERSION
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -148,7 +149,7 @@ sub list_contents {
         #next unless -d $trash_dir;
         #next unless -d "$trash_dir/info";
         opendir my($dh), "$trash_dir/info"
-            or die "Can't read trash info dir $trash_dir/info: $!";
+            or do { warn "Can't read trash info dir $trash_dir/info: $!";next };
         for my $e (readdir $dh) {
             next unless $e =~ /\.trashinfo$/;
             local $/;
@@ -331,7 +332,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.14 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-05-17.
+This document describes version 0.15 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-11-13.
 
 =head1 SYNOPSIS
 
@@ -415,7 +416,7 @@ List user's existing trash directories on the system.
 
 Return a list of trash directories. Sample output:
 
- ("/home/steven/.local/share/Trash",
+ ("/home/mince/.local/share/Trash",
   "/tmp/.Trash-1000")
 
 =head2 $trash->list_contents([$trash_dir]) => LIST
@@ -426,10 +427,10 @@ If $trash_dir is not specified, list contents from all existing trash
 directories. Die if $trash_dir does not exist or inaccessible or corrupt. Return
 a list of records like the sample below:
 
- ({entry=>"file1", path=>"/home/steven/file1", deletion_date=>1342061508,
-   trash_dir=>"/home/steven/.local/share/Trash"},
-  {entry=>"file1.2", path=>"/home/steven/sub/file1", deletion_date=>1342061580,
-   trash_dir=>"/home/steven/.local/share/Trash"},
+ ({entry=>"file1", path=>"/home/mince/file1", deletion_date=>1342061508,
+   trash_dir=>"/home/mince/.local/share/Trash"},
+  {entry=>"file1.2", path=>"/home/mince/sub/file1", deletion_date=>1342061580,
+   trash_dir=>"/home/mince/.local/share/Trash"},
   {entry=>"dir1", path=>"/tmp/dir1", deletion_date=>1342061510,
    trash_dir=>"/tmp/.Trash-1000"})
 
@@ -562,7 +563,7 @@ Please visit the project's homepage at L<https://metacpan.org/release/File-Trash
 
 =head1 SOURCE
 
-Source repository is at L<https://github.com/sharyanto/perl-File-Trash-FreeDesktop>.
+Source repository is at L<https://github.com/perlancar/perl-File-Trash-FreeDesktop>.
 
 =head1 BUGS
 
@@ -574,11 +575,11 @@ feature.
 
 =head1 AUTHOR
 
-Steven Haryanto <stevenharyanto@gmail.com>
+perlancar <perlancar@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2014 by Steven Haryanto.
+This software is copyright (c) 2014 by perlancar@cpan.org.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
