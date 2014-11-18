@@ -1,7 +1,7 @@
 package File::Trash::FreeDesktop;
 
-our $DATE = '2014-11-13'; # DATE
-our $VERSION = '0.15'; # VERSION
+our $DATE = '2014-11-18'; # DATE
+our $VERSION = '0.16'; # VERSION
 
 use 5.010001;
 use strict;
@@ -332,7 +332,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.15 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-11-13.
+This document describes version 0.16 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-11-18.
 
 =head1 SYNOPSIS
 
