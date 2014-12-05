@@ -2,8 +2,8 @@ NAME
     File::Trash::FreeDesktop - Trash files
 
 VERSION
-    This document describes version 0.16 of File::Trash::FreeDesktop (from
-    Perl distribution File-Trash-FreeDesktop), released on 2014-11-18.
+    This document describes version 0.17 of File::Trash::FreeDesktop (from
+    Perl distribution File-Trash-FreeDesktop), released on 2014-12-05.
 
 SYNOPSIS
      use File::Trash::FreeDesktop;

@@ -1,7 +1,7 @@
 package File::Trash::FreeDesktop;
 
-our $DATE = '2014-11-18'; # DATE
-our $VERSION = '0.16'; # VERSION
+our $DATE = '2014-12-05'; # DATE
+our $VERSION = '0.17'; # VERSION
 
 use 5.010001;
 use strict;
@@ -9,7 +9,7 @@ use warnings;
 use Log::Any '$log';
 
 use Fcntl;
-use SHARYANTO::File::Util qw(file_exists l_abs_path);
+use File::MoreUtil qw(file_exists l_abs_path);
 
 sub new {
     require File::HomeDir::FreeDesktop;
@@ -332,7 +332,7 @@ File::Trash::FreeDesktop - Trash files
 
 =head1 VERSION
 
-This document describes version 0.16 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-11-18.
+This document describes version 0.17 of File::Trash::FreeDesktop (from Perl distribution File-Trash-FreeDesktop), released on 2014-12-05.
 
 =head1 SYNOPSIS
 
